@@ -55,14 +55,11 @@ func(bird *Bird) draw(screen *ebiten.Image) {
     screen.DrawImage(bird.images[bird.active], op)
 }
 
-func(bird *Bird) flap(system *PipeSystem) {
+func(bird *Bird) flap() {
     bird.count += bird.idx_increment
     bird.active = bird.count/5
     if (bird.count >= (frameNum-1)*5 || bird.count <= 0) {
         bird.idx_increment = -bird.idx_increment
-    }
-    if bird.touch_pipe_system(system) {
-        bird.die()
     }
 }
 
@@ -74,8 +71,4 @@ func(bird *Bird) touch_pipe(pipe *Pipe) bool {
         return true
     }
     return false
-}
-
-func(bird *Bird) touch_pipe_system(system *PipeSystem) bool {
-    return bird.touch_pipe(system.pipes[system.first_pipe_idx])
 }

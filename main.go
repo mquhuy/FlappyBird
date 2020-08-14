@@ -52,39 +52,7 @@ const (
 
 var (
 	background, base *ebiten.Image
-    bird *Bird
-    system *PipeSystem
 )
-
-type Game struct {
-}
-
-func (g *Game) Update(screen *ebiten.Image) error {
-    bird.flap(system)
-    system.move()
-	return nil
-}
-
-func (g *Game) Draw(screen *ebiten.Image) {
-
-	op_bg := &ebiten.DrawImageOptions{}
-	op_base := &ebiten.DrawImageOptions{}
-    op_base.GeoM.Translate(0, BG_HEIGHT)
-    screen.DrawImage(background, op_bg)
-    screen.DrawImage(base, op_base)
-    for i := 1; i < BG_NUM; i++ {
-        op_bg.GeoM.Translate(BG_WIDTH, 0)
-        op_base.GeoM.Translate(BG_WIDTH, 0)
-        screen.DrawImage(background, op_bg)
-        screen.DrawImage(base, op_base)
-    }
-    bird.draw(screen)
-    system.draw(screen)
-}
-
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return SCREEN_WIDTH, SCREEN_HEIGHT
-}
 
 func main() {
     img, _, err := ebitenutil.NewImageFromFile("images/background-night.png", ebiten.FilterDefault)
@@ -96,14 +64,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-    bird = new_bird()
-    system = new_pipe_system()
+    game := new_game()
 
 	ebiten.SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT)
 	ebiten.SetWindowTitle("Flappy Bird")
     //ebiten.SetRunnableOnUnfocused(true)
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }
