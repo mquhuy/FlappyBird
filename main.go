@@ -1,11 +1,9 @@
 package main
 
 import (
-	_ "image/png"
 	"log"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 const (
@@ -27,11 +25,14 @@ const (
 	frameNum = 3
 
     // GRAVITY of the earth
-    GRAVITY = 10
+    GRAVITY = 0.1
 
     // Height and width of the bird image
     BIRD_HEIGHT = 24
     BIRD_WIDTH = 34
+
+    // Acceleration of a bird jump
+    BIRD_JUMP_ACC = 10
 
     // Height and width of the pipe image
     PIPE_HEIGHT = 320
@@ -50,20 +51,7 @@ const (
     PIPE_NUM = SCREEN_WIDTH / DISTANCE + 1
 )
 
-var (
-	background, base *ebiten.Image
-)
-
 func main() {
-    img, _, err := ebitenutil.NewImageFromFile("images/background-night.png", ebiten.FilterDefault)
-	if err != nil {
-		log.Fatal(err)
-	}
-    background = img
-    base, _, err = ebitenutil.NewImageFromFile("images/base.png", ebiten.FilterDefault)
-	if err != nil {
-		log.Fatal(err)
-	}
     game := new_game()
 
 	ebiten.SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT)

@@ -4,11 +4,11 @@ import (
 	_ "image/png"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
+    "math"
 )
 
 type Bird struct {
     images [frameNum]*ebiten.Image
-    initial_latitude float64
     longitude float64
     latitude float64
     alive bool
@@ -21,22 +21,16 @@ type Bird struct {
 func new_bird() *Bird {
     bird := Bird{}
     bird_upflap, _, _ := ebitenutil.NewImageFromFile("images/yellowbird-upflap.png", ebiten.FilterDefault)
-    bird.images[0] = bird_upflap
     bird_midflap, _, _ := ebitenutil.NewImageFromFile("images/yellowbird-midflap.png", ebiten.FilterDefault)
-    bird.images[1] = bird_midflap
     bird_downflap, _, _ := ebitenutil.NewImageFromFile("images/yellowbird-downflap.png", ebiten.FilterDefault)
-    bird.images[2] = bird_downflap
-    bird.initial_latitude = float64(BG_HEIGHT)/2 - float64(BIRD_HEIGHT)/2
-    bird.latitude = bird.initial_latitude
+    bird.images = [frameNum]*ebiten.Image{bird_upflap, bird_midflap, bird_downflap}
     bird.idx_increment = 1
-    bird.longitude = 0
-    bird.velocity = 0
+    bird.reset()
     return &bird
 }
 
 func(bird *Bird) die() {
     bird.alive = false
-    print("Bird dies")
 }
 
 func(bird *Bird) drop() {
@@ -51,7 +45,11 @@ func(bird *Bird) drop() {
 
 func(bird *Bird) draw(screen *ebiten.Image) {
     op := &ebiten.DrawImageOptions{}
-    op.GeoM.Translate(0, bird.latitude)
+    op.GeoM.Translate(bird.longitude, bird.latitude)
+    if !bird.alive {
+        op.GeoM.Rotate(math.Pi/2)
+        op.GeoM.Translate(2, 0)
+    }
     screen.DrawImage(bird.images[bird.active], op)
 }
 
@@ -63,6 +61,10 @@ func(bird *Bird) flap() {
     }
 }
 
+func(bird *Bird) jump() {
+    bird.velocity -= BIRD_JUMP_ACC
+}
+
 func(bird *Bird) touch_pipe(pipe *Pipe) bool {
     if pipe.longitude < -PIPE_WIDTH || pipe.longitude > BIRD_WIDTH {
         return false
@@ -71,4 +73,11 @@ func(bird *Bird) touch_pipe(pipe *Pipe) bool {
         return true
     }
     return false
+}
+
+func(bird *Bird) reset() {
+    bird.alive = true
+    bird.latitude = float64(BG_HEIGHT)/2 - float64(BIRD_HEIGHT)/2
+    bird.longitude = 10
+    bird.velocity = 0
 }
