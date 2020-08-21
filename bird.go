@@ -94,6 +94,6 @@ func(bird *Bird) reset() {
     bird.alive = true
     bird.active = false
     bird.latitude = float64(BG_HEIGHT)/2 - float64(BIRD_HEIGHT)/2
-    bird.longitude = 10
+    bird.longitude = 20
     bird.velocity = 0
 }
