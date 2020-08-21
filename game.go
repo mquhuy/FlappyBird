@@ -35,18 +35,18 @@ func new_game() *Game {
 
 func(game *Game) start_game() {
     game.mode = "on"
+    game.bird.active = true
     game.release_new_pipe()
 }
 
 func (game *Game) Update(screen *ebiten.Image) error {
     game.switch_mode()
+    game.bird.update()
     switch game.mode {
     case "waiting":
         game.background.move()
-        game.bird.flap()
     case "on":
-        game.bird.flap()
-        game.bird.drop()
+        game.background.move()
         for _, pipe := range game.pipes {
             pipe.move()
         }
@@ -60,9 +60,10 @@ func (game *Game) Update(screen *ebiten.Image) error {
         }
         if game.bird.touch_pipe(game.first_pipe()) {
             game.mode = "over"
+            game.bird.die()
         }
     case "over":
-        game.bird.die()
+        game.bird.drop()
     }
 	return nil
 }

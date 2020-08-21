@@ -12,7 +12,8 @@ type Bird struct {
     longitude float64
     latitude float64
     alive bool
-    active int
+    active bool
+    active_img_idx int
     count int
     idx_increment int
     velocity float64
@@ -31,6 +32,7 @@ func new_bird() *Bird {
 
 func(bird *Bird) die() {
     bird.alive = false
+    bird.active = false
 }
 
 func(bird *Bird) drop() {
@@ -45,18 +47,18 @@ func(bird *Bird) drop() {
 
 func(bird *Bird) draw(screen *ebiten.Image) {
     op := &ebiten.DrawImageOptions{}
-    op.GeoM.Translate(bird.longitude, bird.latitude)
     if !bird.alive {
-        op.GeoM.Rotate(math.Pi/2)
-        op.GeoM.Translate(2, 0)
+        op.GeoM.Rotate(math.Pi/3)
+        op.GeoM.Translate(BIRD_HEIGHT, 0)
     }
-    screen.DrawImage(bird.images[bird.active], op)
+    op.GeoM.Translate(bird.longitude, bird.latitude)
+    screen.DrawImage(bird.images[bird.active_img_idx], op)
 }
 
 func(bird *Bird) flap() {
     bird.count += bird.idx_increment
-    bird.active = bird.count/5
-    if (bird.count >= (frameNum-1)*5 || bird.count <= 0) {
+    bird.active_img_idx = bird.count/4
+    if (bird.count >= (frameNum-1)*4 || bird.count <= 0) {
         bird.idx_increment = -bird.idx_increment
     }
 }
@@ -75,8 +77,22 @@ func(bird *Bird) touch_pipe(pipe *Pipe) bool {
     return false
 }
 
+func(bird *Bird) update() {
+    if bird.alive {
+        if bird.active {
+            bird.flap()
+            bird.drop()
+        } else {
+            bird.flap()
+        }
+    } else {
+        bird.drop()
+    }
+}
+
 func(bird *Bird) reset() {
     bird.alive = true
+    bird.active = false
     bird.latitude = float64(BG_HEIGHT)/2 - float64(BIRD_HEIGHT)/2
     bird.longitude = 10
     bird.velocity = 0
