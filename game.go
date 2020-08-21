@@ -4,7 +4,6 @@ import (
     _ "image/png"
 
     "github.com/hajimehoshi/ebiten" 
-    "github.com/hajimehoshi/ebiten/ebitenutil"
     "github.com/hajimehoshi/ebiten/inpututil"
 )
 
@@ -13,21 +12,19 @@ const (
 )
 
 type Game struct {
+    background *Background
     pipes [PIPE_NUM]*Pipe
     bird *Bird
     point int
     first_pipe_idx int
     last_pipe_idx int
-    background *ebiten.Image
-    base *ebiten.Image
     mode string
 }
 
 func new_game() *Game {
     game := Game{}
     game.mode = "waiting"
-    game.background, _, _ = ebitenutil.NewImageFromFile("images/background-night.png", ebiten.FilterDefault)
-    game.base, _, _ = ebitenutil.NewImageFromFile("images/base.png", ebiten.FilterDefault)
+    game.background = new_background()
     for a := 0; a < PIPE_NUM; a++ {
         game.pipes[a] = new_pipe()
     }
@@ -45,6 +42,7 @@ func (game *Game) Update(screen *ebiten.Image) error {
     game.switch_mode()
     switch game.mode {
     case "waiting":
+        game.background.move()
         game.bird.flap()
     case "on":
         game.bird.flap()
@@ -83,18 +81,7 @@ func (game *Game) switch_mode() {
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
-
-	op_bg := &ebiten.DrawImageOptions{}
-	op_base := &ebiten.DrawImageOptions{}
-    op_base.GeoM.Translate(0, BG_HEIGHT)
-    screen.DrawImage(game.background, op_bg)
-    screen.DrawImage(game.base, op_base)
-    for i := 1; i < BG_NUM; i++ {
-        op_bg.GeoM.Translate(BG_WIDTH, 0)
-        op_base.GeoM.Translate(BG_WIDTH, 0)
-        screen.DrawImage(game.background, op_bg)
-        screen.DrawImage(game.base, op_base)
-    }
+    game.background.draw(screen)
     for _, pipe := range game.pipes {
         pipe.draw(screen)
     }
