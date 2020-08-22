@@ -3,7 +3,8 @@ package main
 import (
     _ "image/png"
 
-    "github.com/hajimehoshi/ebiten" 
+    "github.com/hajimehoshi/ebiten"
+    "github.com/hajimehoshi/ebiten/ebitenutil"
     "github.com/hajimehoshi/ebiten/inpututil"
 )
 
@@ -15,20 +16,23 @@ type Game struct {
     background *Background
     pipes [PIPE_NUM]*Pipe
     bird *Bird
-    point int
+    score *Score
     first_pipe_idx int
     last_pipe_idx int
     mode string
+    game_over_sign *ebiten.Image
 }
 
 func new_game() *Game {
     game := Game{}
     game.mode = "waiting"
+    game.score = initiate_scores()
     game.background = new_background()
     for a := 0; a < PIPE_NUM; a++ {
         game.pipes[a] = new_pipe()
     }
     game.bird = new_bird()
+    game.game_over_sign, _, _ = ebitenutil.NewImageFromFile("images/gameover.png", ebiten.FilterDefault)
     game.reset()
     return &game
 }
@@ -55,8 +59,7 @@ func (game *Game) Update(screen *ebiten.Image) error {
         }
         if game.first_pipe().longitude < -PIPE_WIDTH {
             game.reset_first_pipe()
-            game.point += 1
-            print(game.point)
+            game.score.points += 1
         }
         if game.bird.touch_pipe(game.first_pipe()) {
             game.mode = "over"
@@ -87,6 +90,12 @@ func (game *Game) Draw(screen *ebiten.Image) {
         pipe.draw(screen)
     }
     game.bird.draw(screen)
+    switch game.mode {
+    case "on":
+        game.score.draw_score(screen, float64(SCREEN_WIDTH)/2, float64(SCREEN_HEIGHT)/3)
+    case "over":
+        draw_in_center(game.game_over_sign, screen)
+    }
 }
 
 func (game *Game) reset() {
@@ -96,8 +105,8 @@ func (game *Game) reset() {
     game.first_pipe_idx = 0
     game.last_pipe_idx = PIPE_NUM - 1
     game.mode = "waiting"
-    game.point = 0
     game.bird.reset()
+    game.score.reset()
 }
 
 func (game *Game) check_input() {

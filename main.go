@@ -49,6 +49,10 @@ const (
 
     // Number of pipes needed
     PIPE_NUM = SCREEN_WIDTH / DISTANCE + 1
+
+    // Size of a number image
+    NUM_IMG_HEIGHT = 36
+    NUM_IMG_WIDTH = 24
 )
 
 func main() {
