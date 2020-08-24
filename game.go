@@ -8,10 +8,6 @@ import (
     "github.com/hajimehoshi/ebiten/inpututil"
 )
 
-const (
-    KeySpace = iota
-)
-
 type Game struct {
     background *Background
     pipes [PIPE_NUM]*Pipe
@@ -72,7 +68,7 @@ func (game *Game) Update(screen *ebiten.Image) error {
 }
 
 func (game *Game) switch_mode() {
-    if (inpututil.IsKeyJustPressed(KeySpace)) {
+    if (inpututil.IsKeyJustPressed(ebiten.KeySpace)) {
         switch game.mode {
         case "waiting":
             game.start_game()
