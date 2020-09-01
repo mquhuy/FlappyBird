@@ -18,7 +18,7 @@ type Bird struct {
     count int
     idx_increment int
     velocity float64
-    swoosh *wavAudio.WavPlayer
+    swoosh *wavPlayer.WavPlayer
 }
 
 func new_bird() *Bird {
@@ -28,7 +28,7 @@ func new_bird() *Bird {
     bird_downflap, _, _ := ebitenutil.NewImageFromFile("images/yellowbird-downflap.png", ebiten.FilterDefault)
     bird.images = [frameNum]*ebiten.Image{bird_upflap, bird_midflap, bird_downflap}
     bird.idx_increment = 1
-    bird.swoosh, _ = wavAudio.NewWAV("audio/swoosh.wav")
+    bird.swoosh, _ = wavPlayer.NewWAV("audio/swoosh.wav")
     bird.reset()
     return &bird
 }
